@@ -2,44 +2,44 @@ import 'dart:convert';
 
 class Hoca {
   const Hoca({
-    this.soyad,
-    required this.hocaid,
     this.ad,
+    required this.hocaid,
+    this.soyad,
   });
 
   factory Hoca.fromMap(Map<String, dynamic> map) {
     return Hoca(
-      soyad: map['soyad'],
-      hocaid: map['hocaid'].toInt(),
       ad: map['ad'],
+      hocaid: map['hocaid'].toInt(),
+      soyad: map['soyad'],
     );
   }
 
   factory Hoca.fromJson(String source) => Hoca.fromMap(json.decode(source));
 
-  final String? soyad;
+  final String? ad;
 
   final int hocaid;
 
-  final String? ad;
+  final String? soyad;
 
   Hoca copyWith({
-    String? soyad,
-    int? hocaid,
     String? ad,
+    int? hocaid,
+    String? soyad,
   }) {
     return Hoca(
-      soyad: soyad ?? this.soyad,
-      hocaid: hocaid ?? this.hocaid,
       ad: ad ?? this.ad,
+      hocaid: hocaid ?? this.hocaid,
+      soyad: soyad ?? this.soyad,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'soyad': soyad,
-      'hocaid': hocaid,
       'ad': ad,
+      'hocaid': hocaid,
+      'soyad': soyad,
     };
   }
 
@@ -49,16 +49,16 @@ class Hoca {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Hoca && other.soyad == soyad && other.hocaid == hocaid && other.ad == ad;
+    return other is Hoca && other.ad == ad && other.hocaid == hocaid && other.soyad == soyad;
   }
 
   @override
   int get hashCode {
-    return soyad.hashCode ^ hocaid.hashCode ^ ad.hashCode;
+    return ad.hashCode ^ hocaid.hashCode ^ soyad.hashCode;
   }
 
   @override
   String toString() {
-    return 'Hoca(soyad: $soyad, hocaid: $hocaid, ad: $ad)';
+    return 'Hoca(ad: $ad, hocaid: $hocaid, soyad: $soyad)';
   }
 }

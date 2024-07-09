@@ -1,66 +1,66 @@
 import 'dart:convert';
 
-class Reformers {
-  const Reformers({
+class Reformersthursday {
+  const Reformersthursday({
     this.daygroup,
+    this.timegroup,
+    required this.id,
     required this.status,
     this.ogrenciId,
-    this.timegroup,
     required this.name,
-    required this.id,
   });
 
-  factory Reformers.fromMap(Map<String, dynamic> map) {
-    return Reformers(
+  factory Reformersthursday.fromMap(Map<String, dynamic> map) {
+    return Reformersthursday(
       daygroup: map['daygroup'],
+      timegroup: map['timegroup'],
+      id: map['id'].toInt(),
       status: map['status'],
       ogrenciId: map['ogrenci_id']?.toInt(),
-      timegroup: map['timegroup'],
       name: map['name'],
-      id: map['id'].toInt(),
     );
   }
 
-  factory Reformers.fromJson(String source) => Reformers.fromMap(json.decode(source));
+  factory Reformersthursday.fromJson(String source) => Reformersthursday.fromMap(json.decode(source));
 
   final String? daygroup;
+
+  final String? timegroup;
+
+  final int id;
 
   final bool status;
 
   final int? ogrenciId;
 
-  final String? timegroup;
-
   final String name;
 
-  final int id;
-
-  Reformers copyWith({
+  Reformersthursday copyWith({
     String? daygroup,
+    String? timegroup,
+    int? id,
     bool? status,
     int? ogrenciId,
-    String? timegroup,
     String? name,
-    int? id,
   }) {
-    return Reformers(
+    return Reformersthursday(
       daygroup: daygroup ?? this.daygroup,
+      timegroup: timegroup ?? this.timegroup,
+      id: id ?? this.id,
       status: status ?? this.status,
       ogrenciId: ogrenciId ?? this.ogrenciId,
-      timegroup: timegroup ?? this.timegroup,
       name: name ?? this.name,
-      id: id ?? this.id,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'daygroup': daygroup,
+      'timegroup': timegroup,
+      'id': id,
       'status': status,
       'ogrenci_id': ogrenciId,
-      'timegroup': timegroup,
       'name': name,
-      'id': id,
     };
   }
 
@@ -70,22 +70,22 @@ class Reformers {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Reformers &&
+    return other is Reformersthursday &&
         other.daygroup == daygroup &&
+        other.timegroup == timegroup &&
+        other.id == id &&
         other.status == status &&
         other.ogrenciId == ogrenciId &&
-        other.timegroup == timegroup &&
-        other.name == name &&
-        other.id == id;
+        other.name == name;
   }
 
   @override
   int get hashCode {
-    return daygroup.hashCode ^ status.hashCode ^ ogrenciId.hashCode ^ timegroup.hashCode ^ name.hashCode ^ id.hashCode;
+    return daygroup.hashCode ^ timegroup.hashCode ^ id.hashCode ^ status.hashCode ^ ogrenciId.hashCode ^ name.hashCode;
   }
 
   @override
   String toString() {
-    return 'Reformers(daygroup: $daygroup, status: $status, ogrenciId: $ogrenciId, timegroup: $timegroup, name: $name, id: $id)';
+    return 'Reformersthursday(daygroup: $daygroup, timegroup: $timegroup, id: $id, status: $status, ogrenciId: $ogrenciId, name: $name)';
   }
 }

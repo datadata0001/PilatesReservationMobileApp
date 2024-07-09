@@ -3,17 +3,17 @@ import 'dart:convert';
 class Grup {
   const Grup({
     this.grupsaati,
-    this.grupismi,
-    required this.grupid,
     this.dersid,
+    required this.grupid,
+    this.grupismi,
   });
 
   factory Grup.fromMap(Map<String, dynamic> map) {
     return Grup(
       grupsaati: map['grupsaati'],
-      grupismi: map['grupismi'],
-      grupid: map['grupid'].toInt(),
       dersid: map['dersid']?.toInt(),
+      grupid: map['grupid'].toInt(),
+      grupismi: map['grupismi'],
     );
   }
 
@@ -21,32 +21,32 @@ class Grup {
 
   final String? grupsaati;
 
-  final String? grupismi;
+  final int? dersid;
 
   final int grupid;
 
-  final int? dersid;
+  final String? grupismi;
 
   Grup copyWith({
     String? grupsaati,
-    String? grupismi,
-    int? grupid,
     int? dersid,
+    int? grupid,
+    String? grupismi,
   }) {
     return Grup(
       grupsaati: grupsaati ?? this.grupsaati,
-      grupismi: grupismi ?? this.grupismi,
-      grupid: grupid ?? this.grupid,
       dersid: dersid ?? this.dersid,
+      grupid: grupid ?? this.grupid,
+      grupismi: grupismi ?? this.grupismi,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'grupsaati': grupsaati,
-      'grupismi': grupismi,
-      'grupid': grupid,
       'dersid': dersid,
+      'grupid': grupid,
+      'grupismi': grupismi,
     };
   }
 
@@ -58,18 +58,18 @@ class Grup {
 
     return other is Grup &&
         other.grupsaati == grupsaati &&
-        other.grupismi == grupismi &&
+        other.dersid == dersid &&
         other.grupid == grupid &&
-        other.dersid == dersid;
+        other.grupismi == grupismi;
   }
 
   @override
   int get hashCode {
-    return grupsaati.hashCode ^ grupismi.hashCode ^ grupid.hashCode ^ dersid.hashCode;
+    return grupsaati.hashCode ^ dersid.hashCode ^ grupid.hashCode ^ grupismi.hashCode;
   }
 
   @override
   String toString() {
-    return 'Grup(grupsaati: $grupsaati, grupismi: $grupismi, grupid: $grupid, dersid: $dersid)';
+    return 'Grup(grupsaati: $grupsaati, dersid: $dersid, grupid: $grupid, grupismi: $grupismi)';
   }
 }

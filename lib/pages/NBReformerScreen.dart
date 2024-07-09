@@ -1,25 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/modelgen/reformers.g.dart';
+import 'package:flutter_app/modelgen/reformersmonday.g.dart';
 import 'package:flutter_app/pages/NBProfileScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class Frame8 extends StatefulWidget {
+class NBReformerScreen extends StatefulWidget {
+  final List<Reformers?> reformers;
+  final String day;
+  final String time;
+
+  const NBReformerScreen({Key? key, required this.reformers, required this.day, required this.time}) : super(key: key);
+
   @override
-  _Frame8State createState() => _Frame8State();
+  _NBReformerScreenState createState() => _NBReformerScreenState();
 }
 
-class _Frame8State extends State<Frame8> {
+class _NBReformerScreenState extends State<NBReformerScreen> {
   final _client = Supabase.instance.client;
-  List<Reformers> reformers = [];
   User? user;
+  int startIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _fetchReformers();
     fetchUser();
+    setStartIndex();
+  }
+
+  void setStartIndex() {
+    int dayOffset;
+
+    // Gün değerine göre başlangıç indeksi
+    switch (widget.day) {
+      case 'Pazartesi':
+        dayOffset = 0;
+        break;
+      case 'Salı':
+        dayOffset = 78;
+        break;
+      case 'Çarşamba':
+        dayOffset = 156;
+        break;
+      case 'Perşembe':
+        dayOffset = 234;
+        break;
+      case 'Cuma':
+        dayOffset = 312;
+        break;
+      default:
+        dayOffset = 0;
+    }
+
+    int timeOffset;
+    switch (widget.time) {
+      case "08:00:00":
+        timeOffset = 0;
+        break;
+      case "09:00:00":
+        timeOffset = 6;
+        break;
+      case "10:00:00":
+        timeOffset = 12;
+        break;
+      case "11:00:00":
+        timeOffset = 18;
+        break;
+      case "12:00:00":
+        timeOffset = 24;
+        break;
+      case "13:00:00":
+        timeOffset = 30;
+        break;
+      case "14:00:00":
+        timeOffset = 36;
+        break;
+      case "17:00:00":
+        timeOffset = 42;
+        break;
+      case "18:00:00":
+        timeOffset = 48;
+        break;
+      case "19:00:00":
+        timeOffset = 54;
+        break;
+      case "20:00:00":
+        timeOffset = 60;
+        break;
+      case "21:00:00":
+        timeOffset = 66;
+        break;
+      case "22:00:00":
+        timeOffset = 72;
+        break;
+      default:
+        timeOffset = 0;
+    }
+
+    startIndex = dayOffset + timeOffset;
   }
 
   Future<void> fetchUser() async {
@@ -31,35 +110,18 @@ class _Frame8State extends State<Frame8> {
     }
     setState(() {});
   }
-  
-  Future<void> _fetchReformers() async {
-    final response = await _client.from('reformers').select().gte("id", 1).lte("id",6);
-    if (response == null) {
-      setState(() {
-        for (var i = 0; i < response.length; i++) {
-          reformers[i] = (response[i]['name'] as Reformers?)!;
-        }
-      });
-    }
-  }
 
-
-  Future<void> _updateReformer(int index, String? userId) async {
+  Future<void> _updateReformer(int index, String? user) async {
     final response = await _client
         .from('reformers')
-        .update({'ogrenci_id': userId, 'status': userId != null})
-        .eq('id', reformers[index].id)
-        ;
+        .update({'name': user})
+        .eq('id', startIndex + index + 1)
+        .eq('daygroup', widget.day);
     if (response.error == null) {
       setState(() {
-        reformers[index].ogrenciId = userId as int?;
-        reformers[index].status = userId != null;
+        widget.reformers[startIndex + index] = user as Reformers?;
       });
     }
-  }
-
-  Future<void> _sendNotification(String message) async {
-    // Bildirim gönderme kodunu burada ekleyin
   }
 
   @override
@@ -94,7 +156,7 @@ class _Frame8State extends State<Frame8> {
                   crossAxisSpacing: 16,
                   childAspectRatio: 2,
                 ),
-                itemCount: reformers.length,
+                itemCount: widget.reformers.length,
                 itemBuilder: (context, index) {
                   return _buildReformerCard(index);
                 },
@@ -107,7 +169,7 @@ class _Frame8State extends State<Frame8> {
   }
 
   Widget _buildReformerCard(int index) {
-    final reformer = reformers[index];
+    final reformerUser = widget.reformers[index];
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFFEFA4A4),
@@ -119,7 +181,7 @@ class _Frame8State extends State<Frame8> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              reformer.name ?? 'Boş',
+              reformerUser?.name ?? 'Boş',
               style: GoogleFonts.getFont(
                 'Inter',
                 fontWeight: FontWeight.w600,
@@ -127,11 +189,11 @@ class _Frame8State extends State<Frame8> {
                 color: Colors.white,
               ),
             ),
-            if (reformer.ogrenciId != null)
+            if (reformerUser != null)
               Column(
                 children: [
                   Text(
-                    'Sahip: ${reformer.ogrenciId}',
+                    'Sahip: ${reformerUser.name}',
                     style: GoogleFonts.getFont(
                       'Inter',
                       fontWeight: FontWeight.w600,
@@ -143,10 +205,7 @@ class _Frame8State extends State<Frame8> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                     ),
-                    onPressed: () async {
-                      await _updateReformer(index, null);
-                      await _sendNotification('Rezervasyon iptal edildi: ${reformer.name}');
-                    },
+                    onPressed: () => _updateReformer(index, null),
                     child: Text(
                       'İptal Et',
                       style: GoogleFonts.getFont(
@@ -164,10 +223,9 @@ class _Frame8State extends State<Frame8> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                 ),
-                onPressed: () async {
+                onPressed: () {
                   if (user != null) {
-                    await _updateReformer(index, user!.email);
-                    await _sendNotification('Yeni rezervasyon: ${reformer.name}');
+                    _updateReformer(index, user!.email);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -192,3 +250,4 @@ class _Frame8State extends State<Frame8> {
     );
   }
 }
+
