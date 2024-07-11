@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/main.dart';
-import 'package:flutter_app/modelgen/ogrenci.g.dart';
+import 'package:flutter_app/modelgen/users.g.dart';
 import 'package:flutter_app/utils/NBColors.dart';
 import 'package:flutter_app/utils/NBImages.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -20,7 +20,7 @@ class NBProfileScreen extends StatefulWidget {
 class NBProfileScreenState extends State<NBProfileScreen> with SingleTickerProviderStateMixin {
   TabController? tabController;
   User? user;
-  List<Ogrenci> ogrenci = [];
+  List<Users> users = [];
 
   @override
   void initState() {
@@ -81,13 +81,13 @@ class NBProfileScreenState extends State<NBProfileScreen> with SingleTickerProvi
                     children: [
                       CircleAvatar(backgroundImage: AssetImage(NBProfileImage), radius: 50),
                       8.height,
-                      Text(user!.email ?? 'No Email', style: boldTextStyle(size: 20)),
+                      Text(user!.email ?? "No Email", style: boldTextStyle(size: 20)),
                       16.height,
                       Row(
                         children: [
                           Column(
                             children: [
-                              Text(user!.id ?? "id", style: boldTextStyle(color: NBPrimaryColor)),
+                              Text(users as String, style: boldTextStyle(color: NBPrimaryColor)),
                               Text(user!.phone ?? 'phone', style: boldTextStyle()),
                             ],
                           ).expand(),

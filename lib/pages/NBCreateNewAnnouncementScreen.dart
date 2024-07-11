@@ -44,7 +44,6 @@ class NBCreateNewAnnouncemetScreenState extends State<NBCreateNewAnnouncemetScre
     final duyuru = Duyuru(
       title: title,
       content: content,
-      isAudioArticle: isAudioArticle,
       createdAt: DateTime.now(),
       id: null, // ID veritabanı tarafından otomatik oluşturulacak.
     );
@@ -52,7 +51,6 @@ class NBCreateNewAnnouncemetScreenState extends State<NBCreateNewAnnouncemetScre
     final response = await widget.supabaseClient
         .from('duyuru')
         .insert({
-          'is_audio_article': duyuru.isAudioArticle,
           'created_at': duyuru.createdAt?.toIso8601String(),
           'title': duyuru.title,
           'content': duyuru.content,

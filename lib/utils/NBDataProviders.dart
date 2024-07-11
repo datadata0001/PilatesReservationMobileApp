@@ -1,11 +1,8 @@
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/model.dart';
-import 'package:flutter_app/modelgen/ders.g.dart';
-import 'package:flutter_app/modelgen/dersgrup.g.dart';
 import 'package:flutter_app/modelgen/duyuru.g.dart';
-import 'package:flutter_app/modelgen/grup.g.dart';
-import 'package:flutter_app/modelgen/hoca.g.dart';
-import 'package:flutter_app/modelgen/ogrenci.g.dart';
+import 'package:flutter_app/modelgen/reformers.g.dart';
+import 'package:flutter_app/modelgen/users.g.dart';
 import 'package:flutter_app/pages/NBAnnouncementDetailsScreen.dart';
 import 'package:flutter_app/pages/NBAnnouncementScreen.dart';
 import 'package:flutter_app/pages/NBChangePasswordScreen.dart';
@@ -64,83 +61,7 @@ List<NBDrawerItemModel> nbGetDrawerItems(String userId) {
 
 
 
-Future<List<Ders>> nbGetDersDetails() async {
-  
-  final supabase = Supabase.instance.client;
-  
-  final response = await supabase.from('ders').select();
 
-  
-  final List<Ders> tableModel =
-      response.map((item) => Ders.fromMap(item)).toList();
-
-
-  print(tableModel.length);
-  return tableModel;
-}
-
-Future<List<Dersgrup>> nbGetDersGrupDetails() async {
-  
-  final supabase = Supabase.instance.client;
-  
-  final response = await supabase.from('dersGrup').select();
-
-  
-  final List<Dersgrup> tableModel =
-      response.map((item) => Dersgrup.fromMap(item)).toList();
-
-
-  print(tableModel.length);
-  return tableModel;
-}
-
-
-Future<List<Grup>> nbGetGrupDetails() async {
-  
-  final supabase = Supabase.instance.client;
-  
-  final response = await supabase.from('grup').select();
-
-  
-  final List<Grup> tableModel =
-      response.map((item) => Grup.fromMap(item)).toList();
-
-
-  print(tableModel.length);
-  return tableModel;
-}
-
-
-Future<List<Hoca>> nbGetHocaDetails() async {
-  
-  final supabase = Supabase.instance.client;
-  
-  final response = await supabase.from('hoca').select();
-
-  
-  final List<Hoca> tableModel =
-      response.map((item) => Hoca.fromMap(item)).toList();
-
-
-  print(tableModel.length);
-  return tableModel;
-}
-
-
-Future<List<Ogrenci>> nbGetOgrenciDetails() async {
-  
-  final supabase = Supabase.instance.client;
-  
-  final response = await supabase.from('ogrenci').select();
-
-  
-  final List<Ogrenci> tableModel =
-      response.map((item) => Ogrenci.fromMap(item)).toList();
-
-
-  print(tableModel.length);
-  return tableModel;
-}
 
 
 Future<List<Duyuru>> nbGetAnnouncementDetails() async {
@@ -158,6 +79,37 @@ Future<List<Duyuru>> nbGetAnnouncementDetails() async {
   return tableModel;
 }
 
+
+Future<List<Reformers>> nbGetReformersDetails() async {
+  
+  final supabase = Supabase.instance.client;
+  
+  final response = await supabase.from('reformers').select();
+
+  
+  final List<Reformers> tableModel =
+      response.map((item) => Reformers.fromMap(item)).toList();
+
+
+  print(tableModel.length);
+  return tableModel;
+}
+
+
+Future<List<Users>> nbGetUserDetails() async {
+  
+  final supabase = Supabase.instance.client;
+  
+  final response = await supabase.from('users').select("name");
+
+  
+  final List<Users> tableModel =
+      response.map((item) => Users.fromMap(item)).toList();
+
+
+  print(tableModel.length);
+  return tableModel;
+}
 
 
 /*

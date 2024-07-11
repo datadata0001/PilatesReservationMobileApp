@@ -6,8 +6,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-
-
 class NBSingUpScreen extends StatefulWidget {
   static String tag = '/NBSingUpScreen';
 
@@ -16,12 +14,14 @@ class NBSingUpScreen extends StatefulWidget {
 }
 
 class NBSingUpScreenState extends State<NBSingUpScreen> {
-  TextEditingController nameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  FocusNode nameFocus = FocusNode();
+  FocusNode firstNameFocus = FocusNode();
+  FocusNode lastNameFocus = FocusNode();
   FocusNode emailFocus = FocusNode();
   FocusNode phoneFocus = FocusNode();
   FocusNode passwordFocus = FocusNode();
@@ -35,7 +35,8 @@ class NBSingUpScreenState extends State<NBSingUpScreen> {
     final email = emailController.text;
     final password = passwordController.text;
     final phone = phoneController.text;
-    final name = nameController.text;
+    final firstName = firstNameController.text;
+    final lastName = lastNameController.text;
 
     final response = await Supabase.instance.client.auth.signUp(
       email: email,
@@ -46,24 +47,23 @@ class NBSingUpScreenState extends State<NBSingUpScreen> {
       toast('Sign up error: ${response}');
     } else {
       toast('Sign up successful');
-      // Save additional user info to the 'profiles' table
-      final insertResponse = await Supabase.instance.client.from('profiles').insert({
-        'id': response.user!.id,
-        'name': name,
-        'email': email,
+      final insertResponse = await Supabase.instance.client.from('users').insert({
+        'first_name': firstName,
+        'last_name': lastName,
         'phone': phone,
+        'email': email,
       });
 
-    if (response.user == null) {
-      print('Google Sign-In error: ${response}');
-    } else {
-      print('Google Sign-In successful');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => NBHomeScreen(userId: '',)),
-      );
-      
-    }
+
+      if (insertResponse.error != null) {
+        toast('Error saving user info: ${insertResponse.error?.message}');
+      } else {
+        toast('User info saved successfully');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NBHomeScreen(userId: response.user!.id)),
+        );
+      }
     }
   }
 
@@ -81,11 +81,8 @@ class NBSingUpScreenState extends State<NBSingUpScreen> {
     final accessToken = googleAuth?.accessToken;
     final idToken = googleAuth?.idToken;
 
-    if (accessToken == null) {
-      throw 'No Access Token found.';
-    }
-    if (idToken == null) {
-      throw 'No ID Token found.';
+    if (accessToken == null || idToken == null) {
+      throw 'No Access Token or ID Token found.';
     }
 
     final response = await Supabase.instance.client.auth.signInWithIdToken(
@@ -94,17 +91,26 @@ class NBSingUpScreenState extends State<NBSingUpScreen> {
       accessToken: accessToken,
     );
 
-    
-
     if (response.user == null) {
       toast('Google Sign-In error: ${response}');
     } else {
-      toast('Google Sign-In successful');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => NBHomeScreen(userId: '',)),
-      );
+      final profile = googleUser;
+      final insertResponse = await Supabase.instance.client.from('users').insert({
+        'first_name': profile!,
+        'last_name': profile,
+        'phone': '',  // Google sign-in does not provide phone number
+        'email': profile.email,
+      });
 
+      if (insertResponse.error != null) {
+        toast('Error saving user info: ${insertResponse.error?.message}');
+      } else {
+        toast('Google Sign-In successful');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NBHomeScreen(userId: response.user!.id)),
+        );
+      }
     }
   }
 
@@ -123,7 +129,9 @@ class NBSingUpScreenState extends State<NBSingUpScreen> {
             100.height,
             Text('Create new\naccount', style: boldTextStyle(size: 30)),
             30.height,
-            nbAppTextFieldWidget(nameController, 'Name', TextFieldType.NAME, focus: nameFocus, nextFocus: emailFocus),
+            nbAppTextFieldWidget(firstNameController, 'First Name', TextFieldType.NAME, focus: firstNameFocus, nextFocus: lastNameFocus),
+            16.height,
+            nbAppTextFieldWidget(lastNameController, 'Last Name', TextFieldType.NAME, focus: lastNameFocus, nextFocus: emailFocus),
             16.height,
             nbAppTextFieldWidget(emailController, 'Email Address', TextFieldType.EMAIL, focus: emailFocus, nextFocus: phoneFocus),
             16.height,

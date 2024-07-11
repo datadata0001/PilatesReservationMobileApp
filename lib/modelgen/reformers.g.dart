@@ -1,66 +1,66 @@
 import 'dart:convert';
 
 class Reformers {
-  const Reformers({
+   Reformers({
+    this.timegroup,
+    required this.id,
     this.daygroup,
     required this.status,
-    this.ogrenciId,
-    this.timegroup,
     required this.name,
-    required this.id,
+    this.userId, String? user_id,
   });
 
   factory Reformers.fromMap(Map<String, dynamic> map) {
     return Reformers(
+      timegroup: map['timegroup'],
+      id: map['id'].toInt(),
       daygroup: map['daygroup'],
       status: map['status'],
-      ogrenciId: map['ogrenci_id']?.toInt(),
-      timegroup: map['timegroup'],
       name: map['name'],
-      id: map['id'].toInt(),
+      userId: map['user_id']?.toInt(),
     );
   }
 
   factory Reformers.fromJson(String source) => Reformers.fromMap(json.decode(source));
 
-  final String? daygroup;
-
-  final bool status;
-
-  final int? ogrenciId;
-
   final String? timegroup;
-
-  final String name;
 
   final int id;
 
+  final String? daygroup;
+
+  late final bool status;
+
+  late final String name;
+
+  final int? userId;
+
   Reformers copyWith({
+    String? timegroup,
+    int? id,
     String? daygroup,
     bool? status,
-    int? ogrenciId,
-    String? timegroup,
     String? name,
-    int? id,
+    int? userId,
   }) {
     return Reformers(
+      timegroup: timegroup ?? this.timegroup,
+      id: id ?? this.id,
       daygroup: daygroup ?? this.daygroup,
       status: status ?? this.status,
-      ogrenciId: ogrenciId ?? this.ogrenciId,
-      timegroup: timegroup ?? this.timegroup,
       name: name ?? this.name,
-      id: id ?? this.id,
+      userId: userId ?? this.userId,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'timegroup': timegroup,
+      'id': id,
       'daygroup': daygroup,
       'status': status,
-      'ogrenci_id': ogrenciId,
-      'timegroup': timegroup,
       'name': name,
-      'id': id,
+      'user_id': userId,
     };
   }
 
@@ -71,21 +71,21 @@ class Reformers {
     if (identical(this, other)) return true;
 
     return other is Reformers &&
+        other.timegroup == timegroup &&
+        other.id == id &&
         other.daygroup == daygroup &&
         other.status == status &&
-        other.ogrenciId == ogrenciId &&
-        other.timegroup == timegroup &&
         other.name == name &&
-        other.id == id;
+        other.userId == userId;
   }
 
   @override
   int get hashCode {
-    return daygroup.hashCode ^ status.hashCode ^ ogrenciId.hashCode ^ timegroup.hashCode ^ name.hashCode ^ id.hashCode;
+    return timegroup.hashCode ^ id.hashCode ^ daygroup.hashCode ^ status.hashCode ^ name.hashCode ^ userId.hashCode;
   }
 
   @override
   String toString() {
-    return 'Reformers(daygroup: $daygroup, status: $status, ogrenciId: $ogrenciId, timegroup: $timegroup, name: $name, id: $id)';
+    return 'Reformers(timegroup: $timegroup, id: $id, daygroup: $daygroup, status: $status, name: $name, userId: $userId)';
   }
 }

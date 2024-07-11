@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/component/NBAllHomeComponents.dart';
+import 'package:flutter_app/component/NBHomeComponents.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/model.dart';
-import 'package:flutter_app/modelgen/ders.g.dart';
+import 'package:flutter_app/modelgen/reformers.g.dart';
 import 'package:flutter_app/pages/NBProfileScreen.dart';
 import 'package:flutter_app/utils/NBDataProviders.dart';
 import 'package:flutter_app/utils/NBImages.dart';
@@ -23,8 +25,8 @@ class NBHomeScreenState extends State<NBHomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   late List<NBDrawerItemModel> mDrawerList;
-  List<Ders> mNewsList = [];
-  List<Ders> mTechNewsList = [], mFashionNewsList = [], mSportsNewsList = [], mScienceNewsList = [];
+  List<Reformers> mNewsList = [];
+  List<Reformers> mTechNewsList = [], mFashionNewsList = [], mSportsNewsList = [], mScienceNewsList = [];
 
   String userName = "";
 
@@ -38,20 +40,20 @@ class NBHomeScreenState extends State<NBHomeScreen> {
 
   Future<void> init() async {
     // Haber detaylarını getir
-    mNewsList = await nbGetDersDetails();
+    mNewsList = await nbGetReformersDetails();
 
     // Supabase'den kullanıcı profilini getir
     await fetchUserProfile();
 
     // Haberleri kategorilere ayır
     mNewsList.forEach((element) {
-      if (element.saat == 'Technology') {
+      if (element.name == 'Technology') {
         mTechNewsList.add(element);
-      } else if (element.saat == 'Fashion') {
+      } else if (element.id == 'Fashion') {
         mFashionNewsList.add(element);
-      } else if (element.saat == 'Sports') {
+      } else if (element.daygroup == 'Sports') {
         mSportsNewsList.add(element);
-      } else if (element.saat == 'Science') {
+      } else if (element.timegroup == 'Science') {
         mScienceNewsList.add(element);
       }
     });
@@ -131,6 +133,12 @@ class NBHomeScreenState extends State<NBHomeScreen> {
         ),
         body: TabBarView(
           children: [
+            NBAllNewsComponent(list: mNewsList),
+            NBNewsComponent(list: mTechNewsList),
+            NBNewsComponent(list: mFashionNewsList),
+            NBNewsComponent(list: mSportsNewsList),
+            NBNewsComponent(list: mScienceNewsList),
+            
             // Tab contentleri buraya eklenecek
           ],
         ),

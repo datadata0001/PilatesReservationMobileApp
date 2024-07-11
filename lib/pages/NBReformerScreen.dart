@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/modelgen/reformers.g.dart';
-import 'package:flutter_app/modelgen/reformersmonday.g.dart';
+import 'package:flutter_app/modelgen/users.g.dart';
 import 'package:flutter_app/pages/NBProfileScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:postgres/messages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NBReformerScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
   final _client = Supabase.instance.client;
   User? user;
   int startIndex = 0;
+  
 
   @override
   void initState() {
@@ -111,10 +114,22 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     setState(() {});
   }
 
-  Future<void> _updateReformer(int index, String? user) async {
+  Future<void> _updateReformer(int index, String? user ) async {
+
+  final userResponse = await _client
+    .from("users")
+    .select("user_id")
+    .single();
+
+  final int userId = userResponse['user_id'];
+
     final response = await _client
         .from('reformers')
-        .update({'name': user})
+        .update({
+          'name': user,
+          "status":true,
+          "user_id":userId
+        })
         .eq('id', startIndex + index + 1)
         .eq('daygroup', widget.day);
     if (response.error == null) {
@@ -189,11 +204,11 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
                 color: Colors.white,
               ),
             ),
-            if (reformerUser != null)
+            if (reformerUser?.status == true)
               Column(
                 children: [
                   Text(
-                    'Sahip: ${reformerUser.name}',
+                    'Sahip: ${reformerUser?.name}',
                     style: GoogleFonts.getFont(
                       'Inter',
                       fontWeight: FontWeight.w600,
@@ -250,4 +265,3 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     );
   }
 }
-

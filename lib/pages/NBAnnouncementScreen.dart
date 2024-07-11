@@ -140,11 +140,6 @@ class NBAnnouncementScreenState extends State<NBAnnouncementScreen> with SingleT
               bottom: TabBar(
                 controller: tabController,
                 tabs: [
-                  Tab(text: 'All News'),
-                  Tab(text: 'Technology'),
-                  Tab(text: 'Fashion'),
-                  Tab(text: 'Sports'),
-                  Tab(text: 'Science'),
                 ],
                 labelStyle: boldTextStyle(),
                 labelColor: appStore.isDarkModeOn ? white : black,
