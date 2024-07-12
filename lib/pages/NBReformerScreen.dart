@@ -118,10 +118,20 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
 
   final userResponse = await _client
     .from("users")
-    .select("user_id")
+    .select("user_id, first_name")
     .single();
 
   final int userId = userResponse['user_id'];
+  final String firstName = userResponse["first_name"]; 
+  
+
+  final reformerUser = await _client
+    .from("reformers")
+    .select("name, status, timegroup, daygroup")
+    .single();
+  
+
+
 
     final response = await _client
         .from('reformers')
@@ -134,7 +144,12 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
         .eq('daygroup', widget.day);
     if (response.error == null) {
       setState(() {
-        widget.reformers[startIndex + index] = user as Reformers?;
+        widget.reformers[startIndex + index] = Reformers(
+          name:firstName,
+          status: true,
+          userId: userId, 
+          id: startIndex + index + 1, 
+        );
       });
     }
   }
@@ -195,20 +210,11 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              reformerUser?.name ?? 'Boş',
-              style: GoogleFonts.getFont(
-                'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-            if (reformerUser?.status == true)
+            if(reformerUser!.status == true)
               Column(
                 children: [
                   Text(
-                    'Sahip: ${reformerUser?.name}',
+                    'Sahip: ${reformerUser!.name}',
                     style: GoogleFonts.getFont(
                       'Inter',
                       fontWeight: FontWeight.w600,
