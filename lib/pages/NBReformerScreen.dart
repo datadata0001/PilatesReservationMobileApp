@@ -124,15 +124,6 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
   final int userId = userResponse['user_id'];
   final String firstName = userResponse["first_name"]; 
   
-
-  final reformerUser = await _client
-    .from("reformers")
-    .select("name, status, timegroup, daygroup")
-    .single();
-  
-
-
-
     final response = await _client
         .from('reformers')
         .update({
