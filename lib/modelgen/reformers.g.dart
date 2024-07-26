@@ -1,23 +1,23 @@
 import 'dart:convert';
 
 class Reformers {
-   Reformers({
+  const Reformers({
     this.timegroup,
+    this.userId,
     required this.id,
-    this.daygroup,
     required this.status,
     required this.name,
-    this.userId, String? user_id,
+    this.daygroup,
   });
 
   factory Reformers.fromMap(Map<String, dynamic> map) {
     return Reformers(
       timegroup: map['timegroup'],
+      userId: map['user_id']?.toInt(),
       id: map['id'].toInt(),
-      daygroup: map['daygroup'],
       status: map['status'],
       name: map['name'],
-      userId: map['user_id']?.toInt(),
+      daygroup: map['daygroup'],
     );
   }
 
@@ -25,42 +25,42 @@ class Reformers {
 
   final String? timegroup;
 
+  final int? userId;
+
   final int id;
+
+  final bool status;
+
+  final String? name;
 
   final String? daygroup;
 
-  late final bool status;
-
-  late final String name;
-
-  final int? userId;
-
   Reformers copyWith({
     String? timegroup,
+    int? userId,
     int? id,
-    String? daygroup,
     bool? status,
     String? name,
-    int? userId,
+    String? daygroup,
   }) {
     return Reformers(
       timegroup: timegroup ?? this.timegroup,
+      userId: userId ?? this.userId,
       id: id ?? this.id,
-      daygroup: daygroup ?? this.daygroup,
       status: status ?? this.status,
       name: name ?? this.name,
-      userId: userId ?? this.userId,
+      daygroup: daygroup ?? this.daygroup,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'timegroup': timegroup,
+      'user_id': userId,
       'id': id,
-      'daygroup': daygroup,
       'status': status,
       'name': name,
-      'user_id': userId,
+      'daygroup': daygroup,
     };
   }
 
@@ -72,20 +72,20 @@ class Reformers {
 
     return other is Reformers &&
         other.timegroup == timegroup &&
+        other.userId == userId &&
         other.id == id &&
-        other.daygroup == daygroup &&
         other.status == status &&
         other.name == name &&
-        other.userId == userId;
+        other.daygroup == daygroup;
   }
 
   @override
   int get hashCode {
-    return timegroup.hashCode ^ id.hashCode ^ daygroup.hashCode ^ status.hashCode ^ name.hashCode ^ userId.hashCode;
+    return timegroup.hashCode ^ userId.hashCode ^ id.hashCode ^ status.hashCode ^ name.hashCode ^ daygroup.hashCode;
   }
 
   @override
   String toString() {
-    return 'Reformers(timegroup: $timegroup, id: $id, daygroup: $daygroup, status: $status, name: $name, userId: $userId)';
+    return 'Reformers(timegroup: $timegroup, userId: $userId, id: $id, status: $status, name: $name, daygroup: $daygroup)';
   }
 }

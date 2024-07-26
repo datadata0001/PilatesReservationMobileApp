@@ -2,51 +2,51 @@ import 'dart:convert';
 
 class Duyuru {
   const Duyuru({
-    this.createdAt,
-    this.content,
-    this.id,
+    required this.id,
     this.title,
+    this.content,
+    this.createdAt,
   });
 
   factory Duyuru.fromMap(Map<String, dynamic> map) {
     return Duyuru(
-      createdAt: DateTime.tryParse(map['created_at'] ?? ""),
-      content: map['content'],
       id: map['id'].toInt(),
       title: map['title'],
+      content: map['content'],
+      createdAt: DateTime.tryParse(map['created_at'] ?? ""),
     );
   }
 
   factory Duyuru.fromJson(String source) => Duyuru.fromMap(json.decode(source));
 
-  final DateTime? createdAt;
-
-  final String? content;
-
   final int? id;
 
   final String? title;
 
+  final String? content;
+
+  final DateTime? createdAt;
+
   Duyuru copyWith({
-    DateTime? createdAt,
-    String? content,
     int? id,
     String? title,
+    String? content,
+    DateTime? createdAt,
   }) {
     return Duyuru(
-      createdAt: createdAt ?? this.createdAt,
-      content: content ?? this.content,
       id: id ?? this.id,
       title: title ?? this.title,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'created_at': createdAt?.toIso8601String(),
-      'content': content,
       'id': id,
       'title': title,
+      'content': content,
+      'created_at': createdAt?.toIso8601String(),
     };
   }
 
@@ -57,19 +57,19 @@ class Duyuru {
     if (identical(this, other)) return true;
 
     return other is Duyuru &&
-        other.createdAt == createdAt &&
-        other.content == content &&
         other.id == id &&
-        other.title == title;
+        other.title == title &&
+        other.content == content &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
-    return createdAt.hashCode ^ content.hashCode ^ id.hashCode ^ title.hashCode;
+    return id.hashCode ^ title.hashCode ^ content.hashCode ^ createdAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'Duyuru(createdAt: $createdAt, content: $content, id: $id, title: $title)';
+    return 'Duyuru(id: $id, title: $title, content: $content, createdAt: $createdAt)';
   }
 }

@@ -10,7 +10,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 const webClientId = 'my-web.apps.googleusercontent.com';
 const iosClientId = 'my-ios.apps.googleusercontent.com';
 
@@ -31,29 +30,15 @@ class NBSignInScreenState extends State<NBSignInScreen> {
   @override
   void initState() {
     super.initState();
-    
   }
 
   Future<void> loginSupabase() async {
-      final AuthResponse res = await supabase.auth.signInWithPassword(
-      email: emailController.text,
-      password: passwordController.text,
+    // Şifre doğrulama işlemini atla ve doğrudan ana sayfaya yönlendir
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => NBHomeScreen(userId: '',)), // userId kontrol et
     );
-    final Session? session = res.session;
-    final User? user = res.user;
-    if (user == null)
-    {
-      print("Giriş başarısız!");
-    }
-    else{
-      print("Giriş başarılı!");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => NBHomeScreen(userId: '',)),/// userId kontrol et
-      );
-    }
   }
-
 
   Future<void> _nativeGoogleSignIn() async {
     const webClientId = 'my-web.apps.googleusercontent.com';
@@ -82,15 +67,13 @@ class NBSignInScreenState extends State<NBSignInScreen> {
       accessToken: accessToken,
     );
 
-    
-
     if (response.user == null) {
       print('Google Sign-In error: ${response}');
     } else {
       print('Google Sign-In successful');
       Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => NBHomeScreen(userId:" ",)),
+        context,
+        MaterialPageRoute(builder: (context) => NBHomeScreen(userId: " ",)),
       );
     }
   }
@@ -133,7 +116,6 @@ class NBSignInScreenState extends State<NBSignInScreen> {
               context,
               'Giriş Yap',
               () {
-                //NBHomeScreen().launch(context);
                 loginSupabase();
               },
             ),
@@ -179,17 +161,15 @@ class NBSignInScreenState extends State<NBSignInScreen> {
                 16.width,
                 AppButton(
                   child: Row(
-                    
                     children: [
-                      
                       Image.asset(NBGoogleLogo, width: 20, height: 20),
                       8.width,
                       Text('Google', style: primaryTextStyle(color: black)),
-                      
                     ],
                   ),
-                  onTap: () async{
+                  onTap: () async {
                     await _nativeGoogleSignIn();
+                    await supabase.auth.signInWithOAuth(OAuthProvider.google);
                     NBHomeScreen(userId: '',).launch(context);
                   },
                   width: (context.width() - (3 * 16)) * 0.5,

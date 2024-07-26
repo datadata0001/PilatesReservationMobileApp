@@ -2,72 +2,72 @@ import 'dart:convert';
 
 class Users {
   const Users({
-    required this.phone,
-    required this.userId,
-    this.fee,
     required this.email,
+    required this.userId,
+    this.classHours,
     required this.firstName,
     required this.lastName,
-    this.classHours,
+    required this.phone,
+    this.fee,
   });
 
   factory Users.fromMap(Map<String, dynamic> map) {
     return Users(
-      phone: map['phone'],
-      userId: map['user_id'].toInt(),
-      fee: map['fee']?.toDouble(),
       email: map['email'],
+      userId: map['user_id'].toInt(),
+      classHours: map['class_hours']?.toInt(),
       firstName: map['first_name'],
       lastName: map['last_name'],
-      classHours: map['class_hours']?.toInt(),
+      phone: map['phone'],
+      fee: map['fee']?.toDouble(),
     );
   }
 
   factory Users.fromJson(String source) => Users.fromMap(json.decode(source));
 
-  final String phone;
+  final String email;
 
   final int userId;
 
-  final double? fee;
-
-  final String email;
+  final int? classHours;
 
   final String firstName;
 
   final String lastName;
 
-  final int? classHours;
+  final String phone;
+
+  final double? fee;
 
   Users copyWith({
-    String? phone,
-    int? userId,
-    double? fee,
     String? email,
+    int? userId,
+    int? classHours,
     String? firstName,
     String? lastName,
-    int? classHours,
+    String? phone,
+    double? fee,
   }) {
     return Users(
-      phone: phone ?? this.phone,
-      userId: userId ?? this.userId,
-      fee: fee ?? this.fee,
       email: email ?? this.email,
+      userId: userId ?? this.userId,
+      classHours: classHours ?? this.classHours,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      classHours: classHours ?? this.classHours,
+      phone: phone ?? this.phone,
+      fee: fee ?? this.fee,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'phone': phone,
-      'user_id': userId,
-      'fee': fee,
       'email': email,
+      'user_id': userId,
+      'class_hours': classHours,
       'first_name': firstName,
       'last_name': lastName,
-      'class_hours': classHours,
+      'phone': phone,
+      'fee': fee,
     };
   }
 
@@ -78,28 +78,28 @@ class Users {
     if (identical(this, other)) return true;
 
     return other is Users &&
-        other.phone == phone &&
-        other.userId == userId &&
-        other.fee == fee &&
         other.email == email &&
+        other.userId == userId &&
+        other.classHours == classHours &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        other.classHours == classHours;
+        other.phone == phone &&
+        other.fee == fee;
   }
 
   @override
   int get hashCode {
-    return phone.hashCode ^
+    return email.hashCode ^
         userId.hashCode ^
-        fee.hashCode ^
-        email.hashCode ^
+        classHours.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
-        classHours.hashCode;
+        phone.hashCode ^
+        fee.hashCode;
   }
 
   @override
   String toString() {
-    return 'Users(phone: $phone, userId: $userId, fee: $fee, email: $email, firstName: $firstName, lastName: $lastName, classHours: $classHours)';
+    return 'Users(email: $email, userId: $userId, classHours: $classHours, firstName: $firstName, lastName: $lastName, phone: $phone, fee: $fee)';
   }
 }

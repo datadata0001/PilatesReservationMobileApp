@@ -3,6 +3,7 @@ import 'package:flutter_app/main.dart';
 import 'package:flutter_app/modelgen/reformers.g.dart';
 import 'package:flutter_app/modelgen/users.g.dart';
 import 'package:flutter_app/pages/NBProfileScreen.dart';
+import 'package:flutter_app/utils/NBDataProviders.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:postgres/messages.dart';
@@ -23,13 +24,14 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
   final _client = Supabase.instance.client;
   User? user;
   int startIndex = 0;
-  
+  List<Reformers> mReformersList = [];
 
   @override
   void initState() {
     super.initState();
     fetchUser();
     setStartIndex();
+    fetchReformers();
   }
 
   void setStartIndex() {
@@ -114,36 +116,103 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     setState(() {});
   }
 
+  Future<void> fetchReformers() async {
+    try {
+      List<Reformers> fetchedReformers = await nbGetReformersDetails();
+      print('Fetched Reformers: $fetchedReformers'); // Verilerin doğru alınıp alınmadığını kontrol et
+      fetchedReformers.sort((a,b) => a.id.compareTo(b.id));
+      setState(() {
+        mReformersList = fetchedReformers
+            .where((reformer)=>
+                reformer.daygroup == widget.day && reformer.timegroup == widget.time)
+            .toList();
+      });
+    } catch (e) {
+      print('Error fetching reformers: $e');
+    }
+  }
+  
   Future<void> _updateReformer(int index, String? user ) async {
+    if(user == null){
+      //iptal etme durumu (reformer'i müsait hale getirme)
+      final response = await _client
+      .from("reformers")
+      .update({
+        "name":"Reformer",
+        "status":false,
+        "user_id":null,
+      })
+      .eq("id", startIndex+index+1)
+      .eq("daygroup", widget.day);
 
+    if(response.error != null){
+      print("Error updating reformer: ${response.error!.message}");
+      return;
+    }
+
+    setState((){
+      widget.reformers[startIndex + index] = Reformers(
+        name:"Reformer",
+        id: startIndex + index + 1, 
+        status: false, 
+        userId: null);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:Text("Reformer başarıyla iptal edildi."),
+     ),
+    );
+    }else {
+  //rezervasyon durumu (reformeri rezerve etme)
   final userResponse = await _client
     .from("users")
     .select("user_id, first_name")
     .single();
 
+  if (userResponse == null) {
+    print('Error fetching user: ${userResponse}');
+    return;
+  }
+
   final int userId = userResponse['user_id'];
   final String firstName = userResponse["first_name"]; 
   
-    final response = await _client
-        .from('reformers')
-        .update({
-          'name': user,
-          "status":true,
-          "user_id":userId
-        })
-        .eq('id', startIndex + index + 1)
-        .eq('daygroup', widget.day);
-    if (response.error == null) {
-      setState(() {
-        widget.reformers[startIndex + index] = Reformers(
-          name:firstName,
-          status: true,
-          userId: userId, 
-          id: startIndex + index + 1, 
-        );
-      });
-    }
+  final response = await _client
+    .from('reformers')
+    .update({
+      'name': firstName,
+      "status": true,
+      "user_id": userId
+    })
+    .eq('id', startIndex + index + 1)
+    .eq('daygroup', widget.day); 
+  
+  if (response.error != null) {
+    print('Error updating reformer: ${response.error!.message}');
+    return;
   }
+
+  setState(() {
+    widget.reformers[startIndex + index] = Reformers(
+      name: firstName,
+      status: true,
+      userId: userId, 
+      id: startIndex + index + 1, 
+    );
+  });
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Reformer başarıyla rezerve edildi."),
+    ),
+  );
+  }
+  await fetchReformers();
+
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +223,11 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF),
+          gradient: LinearGradient(
+            colors: [Color(0xFFFDEBEB), Color(0xFFEFA4A4)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
         padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
         child: Column(
@@ -170,18 +243,20 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
             ),
             SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 2,
-                ),
-                itemCount: widget.reformers.length,
-                itemBuilder: (context, index) {
-                  return _buildReformerCard(index);
-                },
-              ),
+              child: widget.reformers.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 1.5,
+                      ),
+                      itemCount: mReformersList.length, // Örneğin, her zaman 6 öğe gösterileceğini varsayıyoruz
+                      itemBuilder: (context, index) {
+                        return _buildReformerCard(index);
+                      },
+                    ),
             ),
           ],
         ),
@@ -190,7 +265,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
   }
 
   Widget _buildReformerCard(int index) {
-    final reformerUser = widget.reformers[index];
+    final reformer = mReformersList[index];
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFFEFA4A4),
@@ -201,23 +276,32 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if(reformerUser!.status == true)
-              Column(
-                children: [
-                  Text(
-                    'Sahip: ${reformerUser!.name}',
-                    style: GoogleFonts.getFont(
-                      'Inter',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
+            Column(
+              children: [
+                Text(
+                  'Reformer: ${reformer?.name}',
+                  style: GoogleFonts.getFont(
+                    'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: Colors.white,
                   ),
+                ),
+                Text(
+                  'Sahip: ${reformer?.userId ?? 'Boş'}',
+                  style: GoogleFonts.getFont(
+                    'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
+                if (reformer.userId != null) 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                     ),
-                    onPressed: () => _updateReformer(index, null),
+                    onPressed: () => _updateReformer(index,null),
                     child: Text(
                       'İptal Et',
                       style: GoogleFonts.getFont(
@@ -228,37 +312,39 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
                       ),
                     ),
                   ),
-                ],
-              )
-            else
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                onPressed: () {
-                  if (user != null) {
-                    _updateReformer(index, user!.email);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Lütfen önce giriş yapın.'),
+                if (reformer?.userId == null) 
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      if (user != null) {
+                        _updateReformer(index, user!.email);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lütfen önce giriş yapın.'),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      'Rezerve Et',
+                      style: GoogleFonts.getFont(
+                        'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.green,
                       ),
-                    );
-                  }
-                },
-                child: Text(
-                  'Rezerve Et',
-                  style: GoogleFonts.getFont(
-                    'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    color: Colors.white,
+                    ),
                   ),
-                ),
-              ),
+              ],
+            )
           ],
         ),
       ),
     );
   }
 }
+
+

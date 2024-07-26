@@ -13,6 +13,7 @@ import 'package:flutter_app/pages/NBHomeScreen.dart';
 import 'package:flutter_app/pages/NBLanguageScreen.dart';
 import 'package:flutter_app/pages/NBMembershipScreen.dart';
 import 'package:flutter_app/pages/NBNotificationSettingScreen.dart';
+import 'package:flutter_app/pages/NBReformerDetailsScreen.dart';
 import 'package:flutter_app/pages/NBSettingScreen.dart';
 import 'package:flutter_app/pages/NBDropTakeScreen.dart';
 import 'package:flutter_app/utils/NBImages.dart';
@@ -100,7 +101,7 @@ Future<List<Users>> nbGetUserDetails() async {
   
   final supabase = Supabase.instance.client;
   
-  final response = await supabase.from('users').select("name");
+  final response = await supabase.from('users').select();
 
   
   final List<Users> tableModel =

@@ -37,7 +37,7 @@ class NBCreateNewAnnouncemetScreenState extends State<NBCreateNewAnnouncemetScre
     final content = articleController.text;
 
     if (title.isEmpty || content.isEmpty) {
-      toast('Please fill in all fields');
+      toast('Lütfen bir şeyler yazınız..');
       return;
     }
 
@@ -106,9 +106,12 @@ class NBCreateNewAnnouncemetScreenState extends State<NBCreateNewAnnouncemetScre
             16.height,
             nbAppButtonWidget(
               context,
-              'Yayınla!',
+              'Yayınla!'
+              ,
               () {
                 _addArticle();
+                toast('Duyuru yayınlandı!');
+                return;    
               },
             ),
             16.height,
