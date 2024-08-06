@@ -35,6 +35,8 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     setStartIndex();
     fetchReformers();
     setupListener();
+    setupListener2();
+
     //setupSubscriber();
     initializeNotifications();
 
@@ -258,6 +260,17 @@ void setupListener() {
         print("Listen the data ${data.toString()}");
       });
   }
+
+  
+void setupListener2() {
+    _client
+      .from("reformers")
+      .stream(primaryKey: ["id"])
+      .eq('timegroup', widget.time)
+      .listen((List<Map<String, dynamic>> data) {
+        print("Listen the data ${data.toString()}");
+      });
+  }
 /*
 void setupSubscriber(){
   _client
@@ -276,7 +289,7 @@ void setupSubscriber(){
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ders İptal/Seçim'),
+        title: Text('Ders İptal/Seçim',style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Color(0xFFEFA4A4),
       ),
       body: Container(

@@ -52,7 +52,7 @@ List<NBDrawerItemModel> nbGetDrawerItems(String userId) {
   List<NBDrawerItemModel> drawerItems = [];
   drawerItems.add(NBDrawerItemModel(title: 'Anasayfa', userId: userId, widget: NBHomeScreen(userId:userId,),));
   drawerItems.add(NBDrawerItemModel(title: 'Ders İptal/Seçim', widget: NBDays(userId: userId), userId: userId));
-  drawerItems.add(NBDrawerItemModel(title: 'Duyurular', widget: NBAnnouncementScreen(), userId: userId));
+  drawerItems.add(NBDrawerItemModel(title: 'Duyurular', widget: NBAnnouncementScreen(userId: '',), userId: userId));
   drawerItems.add(NBDrawerItemModel(title: 'Duyuru Oluştur', widget: NBCreateNewAnnouncemetScreen(supabaseClient: supabase), userId: userId));
   drawerItems.add(NBDrawerItemModel(title: 'Üyelik', widget: NBMembershipScreen(), userId: userId));
   drawerItems.add(NBDrawerItemModel(title: 'Ayarlar', widget: NBSettingScreen(), userId: userId));

@@ -87,7 +87,6 @@ class NBProfileScreenState extends State<NBProfileScreen> with SingleTickerProvi
                         children: [
                           Column(
                             children: [
-                              Text(users as String, style: boldTextStyle(color: NBPrimaryColor)),
                               Text(user!.phone ?? 'phone', style: boldTextStyle()),
                             ],
                           ).expand(),

@@ -84,7 +84,7 @@ Widget build(BuildContext context) {
   return Scaffold(
     key: _scaffoldKey,
     appBar: AppBar(
-      title: Text('Ana Sayfa'),
+      title: Text('Ana Sayfa', style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold)),
       backgroundColor: Color(0xFFEFA4A4),
       leading: IconButton(
         icon: Icon(Icons.menu),

@@ -49,22 +49,15 @@ class NBAnnouncementComponentState extends State<NBAnnouncementComponent> {
               Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
-                  commonCachedNetworkImage('${mData}', height: 100, fit: BoxFit.fill).cornerRadiusWithClipRRect(16),
-                  Container(
-                    padding: EdgeInsets.only(left: 8, right: 8),
-                    decoration: boxDecorationWithRoundedCorners(backgroundColor: black.withOpacity(0.2)),
-                    child: Text('${mData}', style: primaryTextStyle(color: white, size: 14)),
-                  ),
                 ],
               ).expand(flex: 1),
               8.width,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${mData}', style: boldTextStyle(color: NBPrimaryColor)),
                   Text('${mData.title}', style: boldTextStyle(), softWrap: true, maxLines: 3),
                   8.height,
-                  Text('${mData}', style: secondaryTextStyle()),
+                  Text('${mData.content}', style: secondaryTextStyle()),
                 ],
               ).expand(flex: 2),
             ],

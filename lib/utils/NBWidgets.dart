@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/utils/NBColors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -37,13 +38,13 @@ Widget nbAppButtonWidget(BuildContext context, String text, Function onTap) {
 AppBar nbAppBarWidget(BuildContext context, {String? title}) {
   return AppBar(
     leading: IconButton(
-      icon: Icon(Icons.arrow_back, color: appStore.isDarkModeOn ? white : black),
+      icon: Icon(Icons.arrow_back, color: appStore.isDarkModeOn ? Colors.white : Colors.black),
       onPressed: () {
-        finish(context);
+        Navigator.of(context).pop();
       },
     ),
-    title: Text('$title', style: boldTextStyle(size: 20)),
-    backgroundColor: context.cardColor,
+    title: Text('$title', style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold)),
+    backgroundColor: Theme.of(context).cardColor,
     centerTitle: true,
   );
 }

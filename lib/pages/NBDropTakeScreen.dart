@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/NBReformerScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_app/utils/NBWidgets.dart';
 
 class NBDropTakeScreen extends StatelessWidget {
   final String day;
@@ -9,13 +8,49 @@ class NBDropTakeScreen extends StatelessWidget {
 
   NBDropTakeScreen({required this.day, required this.userId});
 
+  List<Widget> buildTimeGroups(BuildContext context, String day) {
+    List<String> times = [
+      '08:00:00',
+      '09:00:00',
+      '10:00:00',
+      '11:00:00',
+      '12:00:00',
+      '13:00:00',
+      '14:00:00',
+      '17:00:00',
+      '18:00:00',
+      '19:00:00',
+      '20:00:00',
+      '21:00:00',
+      '22:00:00',
+    ];
+    List<Widget> timeGroups = [];
+    for (var time in times) {
+      timeGroups.add(
+        buildTimeGroup(
+          context,
+          '${time.split(':')[0]}:00 Grubu',
+          NBReformerScreen(reformers: List.filled(6, null), day: day, time: time),
+        ),
+      );
+    }
+    return timeGroups;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: nbAppBarWidget(context, title: 'Ders İptal/Seçim'),
+      appBar: AppBar(
+        title: Text('Ders İptal/Seçim', style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold)),
+        backgroundColor: Color(0xFFEFA4A4),
+      ),
       body: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF),
+          gradient: LinearGradient(
+            colors: [Color(0xFFFFFFFF), Color(0xFFEFA4A4)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         padding: EdgeInsets.fromLTRB(15, 20, 15, 5),
         child: ListView(
@@ -26,11 +61,11 @@ class NBDropTakeScreen extends StatelessWidget {
                 'Inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 18,
-                color: Color(0xFF000000),
+                color: Color(0xFFFFFFFF),
               ),
             ),
             SizedBox(height: 28),
-
+            ...buildTimeGroups(context, day), // Dinamik olarak zaman gruplarını oluştur
           ],
         ),
       ),
@@ -48,7 +83,11 @@ class NBDropTakeScreen extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: Color(0xFFEFA4A4),
+          gradient: LinearGradient(
+            colors: [Color(0xFFFDEBEB), Color(0xFFEFA4A4)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
@@ -60,7 +99,7 @@ class NBDropTakeScreen extends StatelessWidget {
                 'Inter',
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
-                color: Colors.white,
+                color: Color(0xFF2E2E2E),
               ),
             ),
           ),
