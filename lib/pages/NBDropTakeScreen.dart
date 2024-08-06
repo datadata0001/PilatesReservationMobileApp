@@ -47,7 +47,7 @@ class NBDropTakeScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFFFFFF), Color(0xFFEFA4A4)],
+            colors: [Color(0xFFEFA4A4), Color(0xFFFFFFFF)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -55,15 +55,6 @@ class NBDropTakeScreen extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(15, 20, 15, 5),
         child: ListView(
           children: [
-            Text(
-              'Derslerinizi iptal edebilir ya da değiştirebilirsiniz. Gelmediğiniz derslerin telafisi maalesef mümkün değildir. Sistemin kurallarından dışarıya çıkmak yasaktır.',
-              style: GoogleFonts.getFont(
-                'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-                color: Color(0xFFFFFFFF),
-              ),
-            ),
             SizedBox(height: 28),
             ...buildTimeGroups(context, day), // Dinamik olarak zaman gruplarını oluştur
           ],
@@ -84,7 +75,7 @@ class NBDropTakeScreen extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFDEBEB), Color(0xFFEFA4A4)],
+            colors: [Color(0xFFEFA4A4), Color(0xFFEFA4A4)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -99,7 +90,7 @@ class NBDropTakeScreen extends StatelessWidget {
                 'Inter',
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
-                color: Color(0xFF2E2E2E),
+                color: Color(0xFFFFFFFF),
               ),
             ),
           ),
