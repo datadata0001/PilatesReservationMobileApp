@@ -4,6 +4,7 @@ import 'package:flutter_app/modelgen/reformers.g.dart';
 import 'package:flutter_app/modelgen/users.g.dart';
 import 'package:flutter_app/pages/NBProfileScreen.dart';
 import 'package:flutter_app/utils/NBDataProviders.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:postgres/messages.dart';
@@ -25,6 +26,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
   User? user;
   int startIndex = 0;
   List<Reformers> mReformersList = [];
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -32,6 +34,10 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     fetchUser();
     setStartIndex();
     fetchReformers();
+    setupListener();
+    //setupSubscriber();
+    initializeNotifications();
+
   }
 
   void setStartIndex() {
@@ -105,6 +111,35 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
 
     startIndex = dayOffset + timeOffset;
   }
+  
+  Future<void> initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+
+Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+    
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+    );
+  }
 
   Future<void> fetchUser() async {
     user = supabase.auth.currentUser;
@@ -132,6 +167,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     }
   }
   
+
   Future<void> _updateReformer(int index, String? user ) async {
     if(user == null){
       //iptal etme durumu (reformer'i müsait hale getirme)
@@ -144,12 +180,12 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
       })
       .eq("id", startIndex+index+1)
       .eq("daygroup", widget.day);
-
+/*
     if(response.error != null){
       print("Error updating reformer: ${response.error!.message}");
       return;
     }
-
+*/
     setState((){
       widget.reformers[startIndex + index] = Reformers(
         name:"Reformer",
@@ -163,18 +199,20 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
         content:Text("Reformer başarıyla iptal edildi."),
      ),
     );
+    _showNotification("Reformer İptal Edildi", "Reformer başarıyla iptal edildi.");
+
     }else {
   //rezervasyon durumu (reformeri rezerve etme)
   final userResponse = await _client
     .from("users")
     .select("user_id, first_name")
     .single();
-
+/*
   if (userResponse == null) {
     print('Error fetching user: ${userResponse}');
     return;
   }
-
+*/
   final int userId = userResponse['user_id'];
   final String firstName = userResponse["first_name"]; 
   
@@ -187,12 +225,13 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     })
     .eq('id', startIndex + index + 1)
     .eq('daygroup', widget.day); 
-  
+  /*
   if (response.error != null) {
     print('Error updating reformer: ${response.error!.message}');
     return;
+    
   }
-
+*/
   setState(() {
     widget.reformers[startIndex + index] = Reformers(
       name: firstName,
@@ -210,10 +249,29 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
 
 }
 
-
-
-
-
+void setupListener() {
+    _client
+      .from("reformers")
+      .stream(primaryKey: ["id"])
+      .eq('daygroup', widget.day)
+      .listen((List<Map<String, dynamic>> data) {
+        print("Listen the data ${data.toString()}");
+      });
+  }
+/*
+void setupSubscriber(){
+  _client
+    .channel("reformers")
+    .onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema:"reformers", 
+      callback: (payload){
+        print("Change reveiced: ${payload.toString()}");
+      })
+    .subscribe();
+    
+}
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,7 +357,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
                 if (reformer.userId != null) 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: Color.fromARGB(255, 144, 0, 32),
                     ),
                     onPressed: () => _updateReformer(index,null),
                     child: Text(
@@ -334,7 +392,7 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
                         'Inter',
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
-                        color: Colors.green,
+                        color: Color(0xFFEFA4A4),
                       ),
                     ),
                   ),

@@ -1,32 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/component/NBAnnouncementComponent.dart';
 import 'package:flutter_app/main.dart';
-import 'package:flutter_app/model.dart';
 import 'package:flutter_app/modelgen/duyuru.g.dart';
-import 'package:flutter_app/utils/NBColors.dart';
 import 'package:flutter_app/utils/NBDataProviders.dart';
-import 'package:flutter_app/utils/NBWidgets.dart';
+import 'package:flutter_app/utils/NBColors.dart';
+import 'package:flutter_app/utils/NBImages.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
-
 
 class NBAnnouncementScreen extends StatefulWidget {
   static String tag = '/NBAnnouncementScreen';
-
-
 
   @override
   NBAnnouncementScreenState createState() => NBAnnouncementScreenState();
 }
 
-class NBAnnouncementScreenState extends State<NBAnnouncementScreen> with SingleTickerProviderStateMixin {
-  int pageIndex = 0;
+class NBAnnouncementScreenState extends State<NBAnnouncementScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late List<Duyuru> mAnnouncementList;
-
-
-  PageController? pageController;
-  TabController? tabController;
-
-  List<NBBannerItemModel> pages = nbGetBannerItems();
 
   @override
   void initState() {
@@ -36,133 +27,87 @@ class NBAnnouncementScreenState extends State<NBAnnouncementScreen> with SingleT
   }
 
   Future<void> init() async {
-
-    mAnnouncementList = await nbGetAnnouncementDetails();
-    setState(() {}); // State'i güncellemek için setState kullanılmalı
-
-
-
-
-    
-    pageController = PageController(initialPage: pageIndex, viewportFraction: 1);
-    tabController = TabController(length: 5, vsync: this);
-    
-
-  }
-
-  @override
-  void setState(fn) {
-    if (mounted) super.setState(fn);
-  }
-
-  @override
-  void dispose() {
-    tabController!.dispose();
-    super.dispose();
+    try {
+      mAnnouncementList = await nbGetAnnouncementDetails();
+      setState(() {}); // State'i güncellemek için setState kullanılmalı
+    } catch (e) {
+      print('Error fetching announcements: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        physics: ScrollPhysics(),
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              pinned: true,
-              expandedHeight: 350,
-              iconTheme: IconThemeData(color: appStore.isDarkModeOn ? white : black),
-              backgroundColor: context.cardColor,
-              title: Text('Duyurular', style: boldTextStyle(size: 20)),
-              centerTitle: true,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                background: Container(
-                  margin: EdgeInsets.only(top: 100),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 200,
-                        child: PageView(
-                          controller: pageController,
-                          children: List.generate(
-                            pages.length,
-                            (index) {
-                              return Stack(
-                                children: [
-                                  commonCachedNetworkImage(
-                                    pages[index].image!,
-                                    fit: BoxFit.fill,
-                                    width: context.width(),
-                                  ).cornerRadiusWithClipRRect(16),
-                                  Container(
-                                    alignment: Alignment.bottomLeft,
-                                    height: 200,
-                                    padding: EdgeInsets.all(8),
-                                    color: black.withOpacity(0.25),
-                                    child: Row(
-                                      children: [
-                                        LinearProgressIndicator(
-                                          backgroundColor: grey,
-                                          value: 0.5,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                        ).expand(),
-                                        8.width,
-                                        Text('40:15', style: primaryTextStyle(size: 14, color: white)),
-                                      ],
-                                    ),
-                                  ).cornerRadiusWithClipRRect(16),
-                                ],
-                              ).paddingOnly(left: 16, right: 16);
-                            },
-                          ),
-                          onPageChanged: (value) {
-                            setState(
-                              () {
-                                pageIndex = value;
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      8.height,
-                      DotIndicator(
-                        pageController: pageController!,
-                        pages: pages,
-                        indicatorColor: NBPrimaryColor,
-                        unselectedIndicatorColor: gray,
-                      ),
-                      16.height,
-                    ],
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text('Duyurular'),
+        backgroundColor: Color(0xFFEFA4A4),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage(NBProfileImage),
+                ),
+                title: Text(
+                  'Profil Görüntüle',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF333333),
                   ),
                 ),
-              ),
-              bottom: TabBar(
-                controller: tabController,
-                tabs: [
-                  Tab(text: 'All News'),
-                  Tab(text: 'Technology'),
-                  Tab(text: 'Fashion'),
-                  Tab(text: 'Sports'),
-                  Tab(text: 'Science'),
-                ],
-                labelStyle: boldTextStyle(),
-                labelColor: appStore.isDarkModeOn ? white : black,
-                unselectedLabelStyle: primaryTextStyle(),
-                unselectedLabelColor: grey,
-                isScrollable: true,
-                indicatorColor: NBPrimaryColor,
-                indicatorWeight: 3,
-                indicatorSize: TabBarIndicatorSize.label,
+                onTap: () {
+                  Navigator.pop(context);
+                  // Profil ekranını başlat
+                },
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: tabController,
-          children: [
-            NBAnnouncementComponent(list: mAnnouncementList),
+            Expanded(
+              child: ListView(
+                children: [
+                  // Menü öğeleri buraya eklenebilir
+                ],
+              ),
+            ),
           ],
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFFDEBEB), Color(0xFFEFA4A4)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Duyurular',
+                style: GoogleFonts.getFont(
+                  'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              SizedBox(height: 16),
+              mAnnouncementList.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : NBAnnouncementComponent(list: mAnnouncementList),
+            ],
+          ),
         ),
       ),
     );

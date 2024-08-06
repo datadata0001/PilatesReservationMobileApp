@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/model.dart';
-import 'package:flutter_app/utils/NBColors.dart';
-import 'package:flutter_app/utils/NBDataProviders.dart';
 import 'package:flutter_app/utils/NBWidgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_app/utils/NBColors.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+// FlutterLocalNotificationsPlugin örneği oluşturun
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 class NBNotificationSettingScreen extends StatefulWidget {
   static String tag = '/NBNotificationSettingScreen';
@@ -14,48 +16,58 @@ class NBNotificationSettingScreen extends StatefulWidget {
 }
 
 class NBNotificationSettingScreenState extends State<NBNotificationSettingScreen> {
-  List<NBNotificationItemModel> mNotificationList = nbGetNotificationItems();
+  bool _notificationsEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    init();
+    _loadNotificationSettings();
   }
 
-  Future<void> init() async {
-    //
+  Future<void> _loadNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+    });
   }
 
-  @override
-  void setState(fn) {
-    if (mounted) super.setState(fn);
+  Future<void> _updateNotificationSettings(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _notificationsEnabled = value;
+      prefs.setBool('notifications_enabled', value);
+    });
+    if (value) {
+      await initializeNotifications(); // Bildirimleri etkinleştirin
+    }
+  }
+
+  Future<void> initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: nbAppBarWidget(context, title: 'Bildirim Ayarları'),
-      body: ListView.separated(
+      body: ListView(
         padding: EdgeInsets.all(16),
-        separatorBuilder: (_, index) {
-          return Divider();
-        },
-        itemCount: mNotificationList.length,
-        itemBuilder: (_, index) {
-          return SwitchListTile(
-            contentPadding: EdgeInsets.all(0),
-            value: mNotificationList[index].isOn,
-            onChanged: (value) {
-              setState(
-                () {
-                  mNotificationList[index].isOn = !mNotificationList[index].isOn;
-                },
-              );
+        children: [
+          SwitchListTile(
+            title: Text('Bildirimler', style: primaryTextStyle()),
+            value: _notificationsEnabled,
+            onChanged: (bool value) async {
+              await _updateNotificationSettings(value);
+              // Bildirimleri devre dışı bırakmak uygulama düzeyinde yapılabilir,
+              // ancak cihazın sistem ayarlarında bildirimlerin tamamen kapatılması gerekebilir.
             },
-            title: Text('${mNotificationList[index].title}', style: primaryTextStyle()),
             activeColor: NBPrimaryColor,
-          );
-        },
+          ),
+        ],
       ),
     );
   }

@@ -32,12 +32,21 @@ class NBSignInScreenState extends State<NBSignInScreen> {
     super.initState();
   }
 
-  Future<void> loginSupabase() async {
-    // Şifre doğrulama işlemini atla ve doğrudan ana sayfaya yönlendir
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => NBHomeScreen(userId: '',)), // userId kontrol et
+    Future<void> loginSupabase() async {
+      final AuthResponse res = await supabase.auth.signInWithPassword(
+      email: emailController.text,
+      password: passwordController.text,
     );
+    final Session? session = res.session;
+    final User? user = res.user;
+    if (user == null)
+    {
+      print("sign-in failed");
+    }
+    else{
+      print("sign-in successfuly");
+      NBHomeScreen(userId: '',).launch(context);
+    }
   }
 
   Future<void> _nativeGoogleSignIn() async {

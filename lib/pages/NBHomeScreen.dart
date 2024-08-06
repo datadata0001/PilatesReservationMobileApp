@@ -26,6 +26,7 @@ class NBHomeScreen extends StatefulWidget {
 
 class NBHomeScreenState extends State<NBHomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _client = Supabase.instance.client;
 
   late List<NBDrawerItemModel> mDrawerList;
   List<Reformers> mReformersList = [];
