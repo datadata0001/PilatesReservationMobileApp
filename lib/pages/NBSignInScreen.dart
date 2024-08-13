@@ -125,8 +125,8 @@ class NBSignInScreenState extends State<NBSignInScreen> {
               context,
               'Giriş Yap',
               () {
-                //loginSupabase();
-                NBHomeScreen(userId: '',).launch(context);
+                loginSupabase();
+                //NBHomeScreen(userId: '',).launch(context);
 
               },
             ),

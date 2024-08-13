@@ -35,8 +35,6 @@ class _NBReformerScreenState extends State<NBReformerScreen> {
     setStartIndex();
     fetchReformers();
     setupListener();
-    setupListener2();
-
     //setupSubscriber();
     initializeNotifications();
 
@@ -170,107 +168,89 @@ Future<void> _showNotification(String title, String body) async {
   }
   
 
-  Future<void> _updateReformer(int index, String? user ) async {
-    if(user == null){
-      //iptal etme durumu (reformer'i müsait hale getirme)
-      final response = await _client
-      .from("reformers")
-      .update({
-        "name":"Reformer",
-        "status":false,
-        "user_id":null,
-      })
-      .eq("id", startIndex+index+1)
-      .eq("daygroup", widget.day);
-/*
-    if(response.error != null){
-      print("Error updating reformer: ${response.error!.message}");
+
+
+
+ Future<void> _updateReformer(int index, String? user) async {
+    if (index < 0 || index >= mReformersList.length) {
+      print("Index $index is out of range for the list.");
       return;
     }
-*/
-    setState((){
-      widget.reformers[startIndex + index] = Reformers(
-        name:"Reformer",
-        id: startIndex + index + 1, 
-        status: false, 
-        userId: null);
-    });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:Text("Reformer başarıyla iptal edildi."),
-     ),
-    );
-    _showNotification("Reformer İptal Edildi", "Reformer başarıyla iptal edildi.");
+    if (user == null) {
+      final response = await _client
+        .from("reformers")
+        .update({
+          "name": "Reformer",
+          "status": false,
+          "user_id": null,
+        })
+        .eq("id", startIndex + index + 1)
+        .eq("daygroup", widget.day)
+        .eq("timegroup", widget.time);
 
-    }else {
-  //rezervasyon durumu (reformeri rezerve etme)
-  final userResponse = await _client
-    .from("users")
-    .select("user_id, first_name")
-    .single();
-/*
-  if (userResponse == null) {
-    print('Error fetching user: ${userResponse}');
-    return;
+      setState(() {
+        mReformersList[index] = Reformers(
+          name: "Reformer",
+          id: startIndex + index + 1,
+          status: false,
+          userId: null,
+        );
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Reformer başarıyla iptal edildi.")),
+      );
+      _showNotification("Reformer İptal Edildi", "Reformer başarıyla iptal edildi.");
+    } else {
+      final userResponse = await _client
+        .from("users")
+        .select("user_id, first_name")
+        .single();
+
+      final int userId = userResponse['user_id'];
+      final String firstName = userResponse["first_name"];
+
+      final response = await _client
+        .from('reformers')
+        .update({
+          'name': firstName,
+          "status": true,
+          "user_id": userId
+        })
+        .eq('id', startIndex + index + 1)
+        .eq('daygroup', widget.day)
+        .eq("timegroup", widget.time);
+
+      setState(() {
+        mReformersList[index] = Reformers(
+          name: firstName,
+          status: true,
+          userId: userId,
+          id: startIndex + index + 1,
+        );
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Reformer başarıyla rezerve edildi.")),
+      );
+    }
+
+    await fetchReformers();
   }
-*/
-  final int userId = userResponse['user_id'];
-  final String firstName = userResponse["first_name"]; 
-  
-  final response = await _client
-    .from('reformers')
-    .update({
-      'name': firstName,
-      "status": true,
-      "user_id": userId
-    })
-    .eq('id', startIndex + index + 1)
-    .eq('daygroup', widget.day); 
-  /*
-  if (response.error != null) {
-    print('Error updating reformer: ${response.error!.message}');
-    return;
-    
-  }
-*/
-  setState(() {
-    widget.reformers[startIndex + index] = Reformers(
-      name: firstName,
-      status: true,
-      userId: userId, 
-      id: startIndex + index + 1, 
-    );
-  });
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text("Reformer başarıyla rezerve edildi."),
-    ),
-  );
-  }
-  await fetchReformers();
 
-}
-
-void setupListener() {
+  void setupListener() {
     _client
       .from("reformers")
       .stream(primaryKey: ["id"])
-      .eq('daygroup', widget.day)
       .listen((List<Map<String, dynamic>> data) {
-        print("Listen the data ${data.toString()}");
-      });
-  }
+        print("Received Data: ${data.toString()}");
 
-  
-void setupListener2() {
-    _client
-      .from("reformers")
-      .stream(primaryKey: ["id"])
-      .eq('timegroup', widget.time)
-      .listen((List<Map<String, dynamic>> data) {
-        print("Listen the data ${data.toString()}");
+        // Verileri güncel duruma getirmek için fetchReformers fonksiyonunu çağırın
+        fetchReformers();
       });
   }
+  
 /*
 void setupSubscriber(){
   _client
@@ -314,7 +294,7 @@ void setupSubscriber(){
             ),
             SizedBox(height: 16),
             Expanded(
-              child: widget.reformers.isEmpty
+              child: mReformersList.isEmpty
                   ? Center(child: CircularProgressIndicator())
                   : GridView.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
